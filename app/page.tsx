@@ -1,0 +1,73 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+const pages = ["Home", "About", "Services", "Support", "Donate", "News", "Contact", "Privacy"] as const;
+type Page = (typeof pages)[number];
+
+const photos = {
+  hero: "/hatzolah-ambulance-hero.jpg",
+  team: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1400&q=85",
+  ambulance: "/hatzolah-ambulance-service.jpg",
+  training: "https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1400&q=85",
+  equipment: "/equipment-room-clean.png",
+  community: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1400&q=85",
+};
+
+function Photo({ src, label, className = "", temporary = true }: { src: string; label: string; className?: string; temporary?: boolean }) {
+  return <figure className={`photo ${className}`}><img src={src} alt={label} />{temporary && <figcaption>Temporary photo reference · Replace with your organization’s {label.toLowerCase()}</figcaption>}</figure>;
+}
+
+export default function Site() {
+  const [page, setPage] = useState<Page>("Home");
+  const [menu, setMenu] = useState(false);
+  useEffect(() => {
+    const sync = () => { const p = location.hash.slice(1); if (pages.includes(p as Page)) setPage(p as Page); };
+    sync(); addEventListener("hashchange", sync); return () => removeEventListener("hashchange", sync);
+  }, []);
+  const go = (p: Page) => { setPage(p); setMenu(false); location.hash = p; scrollTo({ top: 0, behavior: "smooth" }); };
+  return <>
+    <div className="emergency-bar"><span>IN A MEDICAL EMERGENCY</span><a href="tel:4504342222">CALL 450-434-2222</a><small>Available 24/7</small></div>
+    <header>
+      <button className="brand" onClick={() => go("Home")} aria-label="Hatzolah home"><img src="/logo.png" alt="Hatzolah logo" /><span><b>HATZOLAH</b><small>Service Ambulancier Bénévole</small></span></button>
+      <button className="menu" onClick={() => setMenu(!menu)} aria-label="Open navigation">☰</button>
+      <nav className={menu ? "open" : ""}>{pages.slice(0, 7).map(p => <button className={page === p ? "active" : ""} onClick={() => go(p)} key={p}>{p}</button>)}<button className="donate" onClick={() => go("Donate")}>Donate now</button></nav>
+    </header>
+    <main>
+      {page === "Home" && <Home go={go} />}
+      {page === "About" && <About />}
+      {page === "Services" && <Services />}
+      {page === "Support" && <Support go={go} />}
+      {page === "Donate" && <Donate />}
+      {page === "News" && <News />}
+      {page === "Contact" && <Contact />}
+      {page === "Privacy" && <Privacy />}
+    </main>
+    <footer><div className="footer-grid"><div className="footer-brand"><img src="/logo.png" alt="Hatzolah" /><div><b>Hatzolah</b><p>Volunteer emergency medical response, serving our community when every second counts.</p></div></div><div><h4>Contact</h4><a href="tel:4504342222">Emergency: 450-434-2222</a><a href="tel:4504356738">Office: 450-435-6738</a><p>3739 Rue de la Rivière-Cachée<br />Boisbriand, QC</p></div><div><h4>Explore</h4>{["About","Services","Support","News","Privacy"].map(p=><button key={p} onClick={()=>go(p as Page)}>{p}</button>)}</div></div><div className="copyright">© 2026 Hatzolah. Temporary website for organizational review.</div></footer>
+  </>;
+}
+
+function Eyebrow({children}:{children:React.ReactNode}) { return <div className="eyebrow">{children}</div>; }
+function PageHero({kicker,title,text}:{kicker:string,title:string,text:string}) { return <section className="page-hero"><Eyebrow>{kicker}</Eyebrow><h1>{title}</h1><p>{text}</p></section>; }
+
+function Home({go}:{go:(p:Page)=>void}) { return <>
+  <section className="hero"><img src={photos.hero} alt="Hatzolah of Tosh ambulance" /><div className="shade"/><div className="hero-copy"><Eyebrow>Volunteer emergency medical response</Eyebrow><h1>Here when<br/><em>every second counts.</em></h1><p>Rapid, compassionate emergency care for our community—24 hours a day, 365 days a year.</p><div className="actions"><a className="primary" href="tel:4504342222">Call emergency line</a><button className="secondary" onClick={()=>go("Donate")}>Support our mission</button></div></div></section>
+  <section className="stats"><div><b>24/7</b><span>Including Shabbos & Yom Tov</span></div><div><b>10</b><span>Volunteer responders</span></div><div><b>2</b><span>Ambulances plus response cars</span></div><div><b>Free</b><span>No charge for emergency service</span></div></section>
+  <section className="split section"><div><Eyebrow>Our mission</Eyebrow><h2>Neighbors helping neighbors in their most critical moments.</h2><p>Hatzolah brings trained volunteer responders, essential medical equipment, and compassionate care directly to people facing an emergency. Our mission is simple: arrive quickly, help skillfully, and treat every person with dignity.</p><button className="text-link" onClick={()=>go("About")}>Learn about Hatzolah →</button></div><Photo src={photos.team} label="volunteer response team photo" /></section>
+  <section className="dark section"><Eyebrow>What we do</Eyebrow><h2>Prepared for the moments that matter.</h2><div className="cards"><article><span>01</span><h3>Emergency response</h3><p>Trained volunteers respond rapidly with lifesaving equipment and care.</p></article><article><span>02</span><h3>Ambulance service</h3><p>Patient-focused transportation and coordinated pre-hospital support.</p></article><article><span>03</span><h3>Training & readiness</h3><p>Continuous education keeps responders prepared for complex emergencies.</p></article></div></section>
+  <section className="cta"><Eyebrow>Powered by community</Eyebrow><h2>Your support helps save lives.</h2><p>Donations sustain medical equipment, ambulances, training, communications, and 24/7 readiness.</p><button className="primary" onClick={()=>go("Donate")}>Make a donation</button></section>
+  </>; }
+
+function About(){return <><PageHero kicker="Who we are" title="A tradition of care. A commitment to respond." text="Hatzolah of Tosh is a first responder agency staffed by 10 volunteers, with two ambulances and response cars."/><section className="split section history"><div className="history-image"><img src="/hatzolah-history.png" alt="Historic Hatzolah of Tosh ambulance photographs"/><small>From the Hatzolah of Tosh archive</small></div><div><Eyebrow>Our story</Eyebrow><h2>Serving Tosh since 1975.</h2><p>Hatzolah of Tosh was started by Rabbi Israel Lowen in 1975 and remains under his guidance today. The service was developed after a tragic electrocution took the life of a young man while emergency medical response was more than 30 minutes away.</p><p>Today, Hatzolah makes immediate intervention available when it is needed. The organization operates 24 hours a day, seven days a week—including Shabbos and Yom Tov—and never charges for its emergency services.</p></div></section><section className="split section team-section"><div><Eyebrow>Our volunteers</Eyebrow><h2>Local people, trained and ready.</h2><p>Ten dedicated volunteers staff the response agency, supported by ambulances, response cars, communications, medical supplies, and continuing education.</p></div><Photo src={photos.team} label="current group portrait of Hatzolah of Tosh volunteers"/></section><section className="values section"><Eyebrow>Our values</Eyebrow><div className="cards"><article><h3>Speed</h3><p>We organize for rapid response because minutes—and seconds—matter.</p></article><article><h3>Compassion</h3><p>Patients and families receive calm, dignified care in stressful moments.</p></article><article><h3>Service</h3><p>Emergency assistance is provided without charge to those who need it.</p></article></div></section></>}
+
+function Services(){return <><PageHero kicker="Our services" title="Emergency care, readiness, and community support." text="A coordinated volunteer response system designed to deliver help quickly and professionally."/><section className="service-list section"><div><Photo src={photos.ambulance} label="Hatzolah of Tosh ambulance in service" temporary={false}/><h2>Emergency medical response</h2><p>Rapid on-scene assessment, stabilization, and support from trained volunteer responders carrying essential equipment.</p></div><div><Photo src={photos.training} label="responder training session"/><h2>Training & preparedness</h2><p>Ongoing clinical education, simulations, and operational practice help keep the team ready around the clock.</p></div><div><Photo src={photos.equipment} label="organized emergency medical equipment" temporary={false}/><h2>Equipment & communications</h2><p>Reliable dispatch, radios, response vehicles, medical bags, AEDs, and supplies support a fast, coordinated response.</p></div></section><section className="emergency-call"><h2>Need emergency help now?</h2><a href="tel:4504342222">450-434-2222</a><p>For urgent medical assistance, call immediately.</p></section></>}
+
+function Support({go}:{go:(p:Page)=>void}){return <><PageHero kicker="Support Hatzolah" title="A lifesaving service sustained by people like you." text="Every contribution strengthens the tools, training, and readiness our volunteers need to respond."/><section className="split section"><div><Eyebrow>Your impact</Eyebrow><h2>Help keep every responder ready.</h2><p>Community support helps fund ambulances, emergency medical supplies, communications equipment, responder education, vehicle maintenance, and day-to-day operations.</p><ul className="check"><li>Equip volunteer response units</li><li>Maintain ambulances and medical gear</li><li>Support advanced training</li><li>Keep communications ready 24/7</li></ul><button className="primary" onClick={()=>go("Donate")}>Support the mission</button></div><Photo src={photos.community} label="community support and fundraising photo"/></section></>}
+
+function Donate(){return <><PageHero kicker="Give today" title="Your generosity helps make rapid care possible." text="This review page demonstrates the intended donation experience. Payments are not enabled yet."/><section className="donation section"><div><Eyebrow>Donation form preview</Eyebrow><h2>Choose your impact</h2><div className="amounts"><button>$36</button><button>$72</button><button>$180</button><button>$360</button><button>$1,000</button><button>Other</button></div><label>Donation frequency<select disabled><option>One-time gift</option></select></label><label>Donor name<input disabled placeholder="Full name" /></label><label>Email address<input disabled placeholder="name@example.com" /></label><button className="primary disabled" disabled>Secure donation checkout — coming soon</button><small>No payment will be processed on this temporary review site.</small></div><aside><h3>Your donation supports</h3><ul className="check"><li>Medical supplies and AEDs</li><li>Ambulance operations</li><li>Volunteer training</li><li>Dispatch and communications</li></ul><div className="safe"><b>Review mode</b><p>The final donation provider and receipt workflow will be connected only after approval and security testing.</p></div></aside></section></>}
+
+function News(){return <><PageHero kicker="News & updates" title="Stories of service, training, and community." text="A future home for organizational updates, campaigns, and community education."/><section className="news section"><article><Photo src={photos.training} label="training event coverage"/><span>Training</span><h2>Keeping skills sharp through continuous education</h2><p>A sample story showing where photos and updates from responder training will appear.</p></article><article><Photo src={photos.ambulance} label="new ambulance announcement"/><span>Equipment</span><h2>Investing in reliable emergency response</h2><p>A sample announcement for a vehicle, equipment upgrade, or fundraising campaign.</p></article><article><Photo src={photos.community} label="community event coverage"/><span>Community</span><h2>Working together to strengthen emergency readiness</h2><p>A sample recap for community programs, milestones, and supporter recognition.</p></article></section></>}
+
+function Contact(){return <><PageHero kicker="Contact us" title="We’re here to help." text="Use the emergency line only for urgent medical assistance. Office inquiries can be directed to the number below."/><section className="contact section"><div className="contact-cards"><article><span>Emergency line · 24/7</span><a href="tel:4504342222">450-434-2222</a><p>Call immediately for urgent medical assistance.</p></article><article><span>Office</span><a href="tel:4504356738">450-435-6738</a><p>For administration and general inquiries.</p></article><article><span>Address</span><h3>3739 Rue de la Rivière-Cachée<br/>Boisbriand, QC</h3><p>Office location; not a walk-in emergency department.</p></article></div><div className="form-preview"><Eyebrow>Message form preview</Eyebrow><h2>General inquiry</h2><div className="form-row"><input disabled placeholder="First name"/><input disabled placeholder="Last name"/></div><input disabled placeholder="Email address"/><textarea disabled placeholder="How can we help?"/><button disabled className="primary disabled">Send message — coming soon</button><small>This temporary review form does not submit or store information.</small></div></section></>}
+
+function Privacy(){return <><PageHero kicker="Privacy" title="Respecting the trust of our community." text="How Hatzolah Tosh Inc. handles information provided through its website and donation process."/><section className="legal section"><h2>Privacy notice</h2><p>This temporary review website does not accept payments, submit contact forms, create user accounts, or intentionally collect personal health information.</p><h3>Information and its use</h3><p>On the final website, Hatzolah may collect contact and billing details needed to process donations, maintain donor records, issue confirmations or tax receipts where applicable, respond to inquiries, improve the donor experience, and meet legal obligations.</p><h3>Sharing and security</h3><p>Donor contact information is not shared for third-party marketing. Information may be provided to trusted service providers supporting payment or website operations, or where legally required. Appropriate security measures will be used, although no online transmission is completely risk-free.</p><h3>Medical emergencies</h3><p>Emergency services are provided at no cost. Do not send medical details through a website form; call <a href="tel:4504342222">450-434-2222</a> for urgent assistance.</p><h3>Questions</h3><p>Email <a href="mailto:info@hatzolaht.com">info@hatzolaht.com</a> or call <a href="tel:4504356738">450-435-6738</a>.</p></section></>}
