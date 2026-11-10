@@ -10,3 +10,7 @@ npm run dev
 ```
 
 Build with `npm run build`.
+
+## Deployment
+
+Temporary review deployments are built automatically on Cloudflare Workers from the `main` branch.
