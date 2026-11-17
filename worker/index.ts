@@ -46,19 +46,16 @@ const worker = {
 
     if (isWordPressRequest) {
       const originUrl = new URL(request.url);
-      originUrl.hostname = "origin.hatzolaht.com";
       if (isDonationEmbed) originUrl.pathname = "/donate/";
-      const originHeaders = new Headers(request.headers);
-      originHeaders.set("Host", "hatzolaht.com");
-      originHeaders.set("X-Forwarded-Host", "hatzolaht.com");
-      originHeaders.set("X-Forwarded-Proto", "https");
       const originRequest = new Request(originUrl, {
         method: request.method,
-        headers: originHeaders,
+        headers: request.headers,
         body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
         redirect: "manual",
       });
-      const originResponse = await fetch(originRequest);
+      const originResponse = await fetch(originRequest, {
+        cf: { resolveOverride: "origin.hatzolaht.com" },
+      } as RequestInit);
       const responseHeaders = new Headers(originResponse.headers);
       const location = responseHeaders.get("Location");
       if (location) {
