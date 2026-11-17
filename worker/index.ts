@@ -29,6 +29,26 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
+    // Keep the existing WordPress donation flow available after the main
+    // domain is attached to this Worker. Cloudflare sends these requests to
+    // the preserved origin while retaining hatzolaht.com as the public host.
+    const isWordPressRequest =
+      url.pathname === "/donate" ||
+      url.pathname.startsWith("/donate/") ||
+      url.pathname.startsWith("/give") ||
+      url.pathname.startsWith("/wp-admin/admin-ajax.php") ||
+      url.pathname.startsWith("/wp-json/give") ||
+      url.pathname.startsWith("/wp-content/") ||
+      url.pathname.startsWith("/wp-includes/") ||
+      url.searchParams.has("givewp-route") ||
+      url.searchParams.has("giveDonationFormInIframe");
+
+    if (isWordPressRequest) {
+      return fetch(new Request(request), {
+        cf: { resolveOverride: "origin.hatzolaht.com" },
+      } as RequestInit);
+    }
+
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
