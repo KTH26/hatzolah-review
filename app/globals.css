@@ -62,3 +62,15 @@
 .form-error a{color:inherit;font-weight:900}
 .form-preview>.safe{margin-top:30px}
 @media(max-width:640px){.contact-form .form-row{grid-template-columns:1fr}.contact-form .primary{width:100%}}
+
+/* Centered, readable privacy policy */
+main:has(.legal) .page-hero{text-align:center;padding-top:85px;padding-bottom:72px}
+main:has(.legal) .page-hero h1,main:has(.legal) .page-hero p{margin-left:auto;margin-right:auto}
+.legal{width:min(920px,88vw);max-width:none;margin:0 auto;padding:84px clamp(24px,6vw,64px);box-shadow:0 18px 55px #071a330d}
+.legal h2{font-size:30px;line-height:1.2;letter-spacing:-.02em;margin:48px 0 14px}
+.legal h2:first-child{margin-top:0}
+.legal h3{font-size:24px;margin:48px 0 14px}
+.legal p{margin:0 0 18px}
+.legal ul{margin:10px 0 26px;padding-left:24px;color:var(--muted)}
+.legal li{font-size:17px;line-height:1.65;margin:8px 0;padding-left:6px}
+@media(max-width:640px){main:has(.legal) .page-hero{padding-top:64px;padding-bottom:56px}.legal{width:92vw;padding:55px 24px;box-shadow:none}.legal h2{font-size:26px;margin-top:38px}}

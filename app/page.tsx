@@ -31,7 +31,7 @@ export default function Site() {
     <header>
       <button className="brand" onClick={() => go("Home")} aria-label="Hatzolah of Kiryas Tosh home"><img src="/logo.png" alt="Official Hatzolah of Kiryas Tosh seal" /><span><b>HATZOLAH</b><small>of Kiryas Tosh · Service Ambulancier Bénévole</small></span></button>
       <button className="menu" onClick={() => setMenu(!menu)} aria-label="Open navigation">☰</button>
-      <nav className={menu ? "open" : ""}>{pages.filter(p => p !== "Donate" && p !== "Privacy").map(p => <button className={page === p ? "active" : ""} onClick={() => go(p)} key={p}>{p}</button>)}<button className="donate" onClick={() => go("Donate")}>Donate now</button></nav>
+      <nav className={menu ? "open" : ""}>{pages.filter(p => p !== "Donate").map(p => <button className={page === p ? "active" : ""} onClick={() => go(p)} key={p}>{p}</button>)}<button className="donate" onClick={() => go("Donate")}>Donate now</button></nav>
     </header>
     <main>
       {page === "Home" && <Home go={go} />}
