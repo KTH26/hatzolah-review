@@ -1,0 +1,33 @@
+name: Preserve WordPress media
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download original video and media catalogue
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir preserved-media
+          curl --fail --location --retry 3 \
+            https://hatzolaht.com/wp-content/uploads/2018/08/new-video-updated.mp4 \
+            --output preserved-media/new-video-updated-original.mp4
+          curl --fail --location --retry 3 \
+            'https://hatzolaht.com/wp-json/wp/v2/media?per_page=100&orderby=date&order=desc' \
+            --output preserved-media/media-catalogue.json
+          file preserved-media/new-video-updated-original.mp4
+          test "$(stat -c%s preserved-media/new-video-updated-original.mp4)" -gt 1000000
+          python -m json.tool preserved-media/media-catalogue.json > /dev/null
+
+      - name: Upload preserved originals
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordpress-preserved-media
+          path: preserved-media/
+          retention-days: 30
