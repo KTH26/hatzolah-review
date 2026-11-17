@@ -28,6 +28,7 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    const isDonationEmbed = url.pathname === "/donate/embed";
 
     // Keep the existing WordPress donation flow available after the main
     // domain is attached to this Worker. Cloudflare sends these requests to
@@ -46,6 +47,7 @@ const worker = {
     if (isWordPressRequest) {
       const originUrl = new URL(request.url);
       originUrl.hostname = "origin.hatzolaht.com";
+      if (isDonationEmbed) originUrl.pathname = "/donate/";
       const originHeaders = new Headers(request.headers);
       originHeaders.set("Host", "hatzolaht.com");
       originHeaders.set("X-Forwarded-Host", "hatzolaht.com");
@@ -61,6 +63,22 @@ const worker = {
       const location = responseHeaders.get("Location");
       if (location) {
         responseHeaders.set("Location", location.replace(/^https?:\/\/origin\.hatzolaht\.com/i, "https://hatzolaht.com"));
+      }
+      if (isDonationEmbed && responseHeaders.get("Content-Type")?.includes("text/html")) {
+        const html = await originResponse.text();
+        const embedStyles = `<style id="hatzolah-embed-style">
+          body { min-height: 1050px !important; margin: 0 !important; background: #fff !important; }
+          body * { visibility: hidden !important; }
+          #give-form-7987-wrap, #give-form-7987-wrap *, .give_error, .give_error *, .give-notice, .give-notice * { visibility: visible !important; }
+          #give-form-7987-wrap { position: absolute !important; top: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: min(100%, 760px) !important; padding: 24px !important; margin: 0 !important; background: #fff !important; }
+        </style>`;
+        responseHeaders.delete("Content-Length");
+        responseHeaders.delete("Content-Encoding");
+        return new Response(html.replace("</head>", `${embedStyles}</head>`), {
+          status: originResponse.status,
+          statusText: originResponse.statusText,
+          headers: responseHeaders,
+        });
       }
       return new Response(originResponse.body, {
         status: originResponse.status,
