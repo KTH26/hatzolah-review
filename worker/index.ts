@@ -67,11 +67,19 @@ const worker = {
           body { min-height: 1050px !important; margin: 0 !important; background: #fff !important; }
           body * { visibility: hidden !important; }
           #give-form-7987-wrap, #give-form-7987-wrap *, .give_error, .give_error *, .give-notice, .give-notice * { visibility: visible !important; }
-          #give-form-7987-wrap { position: absolute !important; top: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: min(100%, 760px) !important; padding: 24px !important; margin: 0 !important; background: #fff !important; }
+          #give-form-7987-wrap { position: absolute !important; top: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: min(100%, 760px) !important; padding: 18px 24px !important; margin: 0 !important; background: #fff !important; }
+          #give-form-7987-wrap > .give-form-title, #give-form-content-7987 { display: none !important; }
+          #give-form-7987-1 { margin-top: 0 !important; }
         </style>`;
+        const embedScript = `<script id="hatzolah-embed-script">
+          document.addEventListener("DOMContentLoaded", function () {
+            var formWrap = document.getElementById("give-form-7987-wrap");
+            if (formWrap) document.body.prepend(formWrap);
+          });
+        </script>`;
         responseHeaders.delete("Content-Length");
         responseHeaders.delete("Content-Encoding");
-        return new Response(html.replace("</head>", `${embedStyles}</head>`), {
+        return new Response(html.replace("</head>", `${embedStyles}</head>`).replace("</body>", `${embedScript}</body>`), {
           status: originResponse.status,
           statusText: originResponse.statusText,
           headers: responseHeaders,
