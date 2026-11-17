@@ -74,3 +74,6 @@ main:has(.legal) .page-hero h1,main:has(.legal) .page-hero p{margin-left:auto;ma
 .legal ul{margin:10px 0 26px;padding-left:24px;color:var(--muted)}
 .legal li{font-size:17px;line-height:1.65;margin:8px 0;padding-left:6px}
 @media(max-width:640px){main:has(.legal) .page-hero{padding-top:64px;padding-bottom:56px}.legal{width:92vw;padding:55px 24px;box-shadow:none}.legal h2{font-size:26px;margin-top:38px}}
+
+/* Present the official seal cleanly against the dark footer. */
+.footer-brand img{object-fit:cover;border-radius:50%;clip-path:circle(49%);background:transparent}

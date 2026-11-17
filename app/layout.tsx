@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Hatzolah | Volunteer Emergency Medical Service",
   description: "Hatzolah volunteer emergency medical response — serving the community 24 hours a day.",
-  icons: { icon: "/logo.ico", shortcut: "/logo.ico" },
+  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
