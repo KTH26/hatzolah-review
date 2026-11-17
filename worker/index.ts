@@ -44,9 +44,29 @@ const worker = {
       url.searchParams.has("giveDonationFormInIframe");
 
     if (isWordPressRequest) {
-      return fetch(new Request(request), {
-        cf: { resolveOverride: "origin.hatzolaht.com" },
-      } as RequestInit);
+      const originUrl = new URL(request.url);
+      originUrl.hostname = "origin.hatzolaht.com";
+      const originHeaders = new Headers(request.headers);
+      originHeaders.set("Host", "hatzolaht.com");
+      originHeaders.set("X-Forwarded-Host", "hatzolaht.com");
+      originHeaders.set("X-Forwarded-Proto", "https");
+      const originRequest = new Request(originUrl, {
+        method: request.method,
+        headers: originHeaders,
+        body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+        redirect: "manual",
+      });
+      const originResponse = await fetch(originRequest);
+      const responseHeaders = new Headers(originResponse.headers);
+      const location = responseHeaders.get("Location");
+      if (location) {
+        responseHeaders.set("Location", location.replace(/^https?:\/\/origin\.hatzolaht\.com/i, "https://hatzolaht.com"));
+      }
+      return new Response(originResponse.body, {
+        status: originResponse.status,
+        statusText: originResponse.statusText,
+        headers: responseHeaders,
+      });
     }
 
     if (url.pathname === "/_vinext/image") {
