@@ -6,7 +6,7 @@ const pages = ["Home", "About", "Services", "Donate", "News", "Contact", "Privac
 type Page = (typeof pages)[number];
 
 const photos = {
-  hero: "/ambulance-arrival.webp",
+  hero: "/hero-real.webp",
   ambulance: "/real-ambulances.png",
   interior: "/ambulance-interior.webp",
   delivery: "/equipment-delivery.webp",
